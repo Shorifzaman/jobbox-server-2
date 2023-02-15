@@ -9,12 +9,16 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q66zrl2.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `${process.env.MONGODB_URL}`;
+console.log(uri);
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q66zrl2.mongodb.net/?retryWrites=true&w=majority`;
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
 
 const run = async () => {
   try {
@@ -28,6 +32,13 @@ const run = async () => {
       const result = await userCollection.insertOne(user);
 
       res.send(result);
+      console.log("postuser",result);
+    });
+    // get all user Collection
+    app.get("/users", async (req, res) => {
+      const cursor = userCollection.find({});
+      const result = await cursor.toArray();
+      res.send({ status: true, data: result });
     });
 
     app.get("/user/:email", async (req, res) => {
@@ -143,6 +154,7 @@ const run = async () => {
       const job = req.body;
 
       const result = await jobCollection.insertOne(job);
+      console.log("job",result);
 
       res.send({ status: true, data: result });
     });
